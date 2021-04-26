@@ -10,7 +10,7 @@ public class MapHistogram
 	//Default Constructor for Histogram
 	public MapHistogram()
 	{
-		map = new HashMap<Character, Integer>();
+		map = new TreeMap<Character, Integer>();
 	}
 
 

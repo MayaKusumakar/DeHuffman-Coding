@@ -16,27 +16,26 @@ public class HuffmanTree{
          
          char letter = (char)(firstInt);
          root = add(root,letter,path,0);
-         map.put(letter, path);
-         
-         
+         map.put(letter, path);    
       }
-      
-      
-      
     }
      
-   public HuffmanTree(Scanner file, Histogram hst){
+   public HuffmanTree(Scanner file, MapHistogram hst){
       buildHistogram(file, hst);
       
-      int[] array = hst.getCountArray();
+      Map<Character,Integer> map = hst.getMap();
       
       PriorityQueue<HuffmanNode> q = new PriorityQueue<>();    
-      for(int i = 0; i < array.length; i++){
-         HuffmanNode n = new HuffmanNode((char)(i+65),array[i]);
+      
+      for(Character c : map.keySet()){
+         HuffmanNode n = new HuffmanNode(c, map.get(c));
          q.add(n);
       }
       
-      q.add(new HuffmanNode((char)(array.length), 1));
+      HuffmanNode n = new HuffmanNode((char)(0), 1);
+      q.add(n);
+      
+      System.out.println(q);
       
       while(q.size() != 1){
       HuffmanNode smallest = q.poll(); 
@@ -51,16 +50,20 @@ public class HuffmanTree{
       }
       
       root = q.poll();
+      
    }
    
    
-   private void buildHistogram(Scanner f, Histogram h){
-      while(f.hasNext()){
+   private void buildHistogram(Scanner f, MapHistogram h){
+      while(f.hasNextLine()){
          String line = f.nextLine();
          char[] charArray = line.toCharArray();
          for(int i = 0; i<charArray.length; i++){
             h.add(charArray[i]);
          }
+         
+         h.add((char)(13));
+         h.add((char)(10));
          
       }
    }
@@ -92,7 +95,8 @@ public class HuffmanTree{
          inOrder(node.getRight());   
       }
       
-         }
+   
+   }
     public void printTree(){
       inOrder(root);
     }

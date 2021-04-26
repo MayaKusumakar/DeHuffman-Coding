@@ -19,11 +19,13 @@ public class DeHuffman{
          */
          
          Scanner uncompressed = new Scanner(new File("hamlet.txt"));
-         Histogram h = new Histogram();
-         HuffmanTree ht2 = new HuffmanTree(uncompressed, h); 
-         
-         ht2.generateCodeFile(new PrintStream(new File("Hamlet2.code")));  
-         
-         ht2.printTree();    
+            
+         MapHistogram mh = new MapHistogram();
+         HuffmanTree ht = new HuffmanTree(uncompressed,mh);
+         ht.printTree();
+                    
+//          ht.generateCodeFile(new PrintStream(new File("Hamlet2.code")));    
+
+            
    }
 }
