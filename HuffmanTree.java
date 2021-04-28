@@ -2,10 +2,12 @@ import java.io.*;
 import java.util.*;
 public class HuffmanTree{
    HuffmanNode root;
+   private Map<Character, String> eMap;
    
    public HuffmanTree(Scanner obj){
       Map<Character, String> map = new TreeMap<Character,String>();
       root = null;      
+      eMap = null;
       int num = 1;
       while(obj.hasNext()){
          
@@ -16,27 +18,27 @@ public class HuffmanTree{
          
          char letter = (char)(firstInt);
          root = add(root,letter,path,0);
-         map.put(letter, path);
-         
-         
+         map.put(letter, path);    
       }
-      
-      
-      
     }
      
-   public HuffmanTree(Scanner file, Histogram hst){
+   public HuffmanTree(Scanner file, MapHistogram hst){
+      eMap = new HashMap<Character, String>();
       buildHistogram(file, hst);
       
-      int[] array = hst.getCountArray();
+      Map<Character,Integer> map = hst.getMap();
       
       PriorityQueue<HuffmanNode> q = new PriorityQueue<>();    
-      for(int i = 0; i < array.length; i++){
-         HuffmanNode n = new HuffmanNode((char)(i+65),array[i]);
+      
+      for(Character c : map.keySet()){
+         HuffmanNode n = new HuffmanNode(c, map.get(c));
          q.add(n);
       }
       
-      q.add(new HuffmanNode((char)(array.length), 1));
+      HuffmanNode n = new HuffmanNode((char)(0), 1);
+      q.add(n);
+      
+      //System.out.println(q);
       
       while(q.size() != 1){
       HuffmanNode smallest = q.poll(); 
@@ -51,18 +53,54 @@ public class HuffmanTree{
       }
       
       root = q.poll();
+      
    }
    
    
-   private void buildHistogram(Scanner f, Histogram h){
-      while(f.hasNext()){
+   private void buildHistogram(Scanner f, MapHistogram h){
+      while(f.hasNextLine()){
          String line = f.nextLine();
          char[] charArray = line.toCharArray();
          for(int i = 0; i<charArray.length; i++){
             h.add(charArray[i]);
          }
          
+         h.add((char)(13));
+         h.add((char)(10));
+         
       }
+   }
+   
+   public void encode(Scanner s, String fileName){
+      BitOutputStream bo = new BitOutputStream(fileName);
+      //bo.writeBit(0);
+      
+      while(s.hasNextLine()){
+         String line = s.nextLine();
+         //System.out.println(line);
+         char[] charArray = line.toCharArray();
+         
+         for(int i = 0; i < charArray.length;i++){
+            String encoding = eMap.get(charArray[i]);
+            for(int j = 0;  j < encoding.length(); j++){
+               bo.writeBit(Character.getNumericValue(encoding.charAt(j)));
+            }
+         }
+         
+           String newLine = eMap.get((char)(10));
+           
+           for(int n = 0; n < newLine.length(); n++){
+              bo.writeBit(Character.getNumericValue(newLine.charAt(n)));
+           }
+           
+           String newCarriage = eMap.get((char)(13));
+           
+           for(int c = 0; c< newCarriage.length(); c++){
+              bo.writeBit(Character.getNumericValue(newCarriage.charAt(c)));
+           }
+           
+      }
+      bo.close();
    }
    
    private HuffmanNode add(HuffmanNode node, Character val, String code, int spot){
@@ -92,7 +130,8 @@ public class HuffmanTree{
          inOrder(node.getRight());   
       }
       
-         }
+   
+   }
     public void printTree(){
       inOrder(root);
     }
@@ -119,6 +158,7 @@ public class HuffmanTree{
          if(n.isLeaf()){
             o.println((int)n.getVal());
             o.println(str);
+            eMap.put(n.getVal(), str);
          }
          inOrderFile(n.getRight(), str+1, o);
       }
